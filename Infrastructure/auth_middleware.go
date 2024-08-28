@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -132,6 +133,7 @@ func GetClaims(c *gin.Context) (*domain.Claims, error) {
 		return &domain.Claims{}, err
 	}
 	if claims, ok := token.Claims.(*domain.Claims); ok && token.Valid {
+		log.Println(claims)
 		return claims, err
 	}
 	return &domain.Claims{}, errors.New("invalid token")

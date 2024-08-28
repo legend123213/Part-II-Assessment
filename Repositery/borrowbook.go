@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 
@@ -62,12 +63,13 @@ func (repo *UserServiceRepo) GetBorrowRequests() ([]*domain.Borrow, error){
 }
 func (repo *UserServiceRepo) UpdateBorrow(id string, status string) error{
 	collection := repo.DBClient.Collection("Requests")
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
+	var borrow domain.Borrow
+	update := bson.M{
+		"$set": bson.M{
+			"status":       status,
+		},
 	}
-	_, err = collection.UpdateOne(context.Background(), bson.M{"_id": oid}, bson.M{"$set": bson.M{"status": status}})
-	if err != nil {
+	if err := collection.FindOneAndUpdate(context.TODO(), bson.M{"_id": id}, update,options.FindOneAndUpdate().SetReturnDocument(1)).Decode(&borrow); err!=nil{
 		return err
 	}
 	return nil
