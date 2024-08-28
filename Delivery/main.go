@@ -37,9 +37,12 @@ func main() {
 	}
 	mongoClint := mongoconnection()
 	userRepo := repositery.NewUserServiceRepo(mongoClint.Database(config.Database.Name))
+	borrowRepo := repositery.NewBookServiceRepo(mongoClint.Database(config.Database.Name))
+	borrowUsecase := usecase.NewBorrowServiceUsecase(borrowRepo)
+	borrowController := controller.NewBorrowController(borrowUsecase)
 	userUsecase := usecase.NewUserServiceUsecase(userRepo)
 	userController := controller.NewUserController(*userUsecase)
-	mainRoute :=routes.NewRoute(userController)
+	mainRoute :=routes.NewRoute(userController,*borrowController)
 	mainRoute.SetupRouter().Run(config.Port)
 
 }
